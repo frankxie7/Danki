@@ -4,7 +4,7 @@ import "./App.css";
 type Flashcard = {
     front: string;
     back: string;
-  };
+};
 
 const FlashcardComponent = ({ card }: { card: Flashcard }) => {
     const [isFlipped, setIsFlipped] = useState<boolean>(false);
@@ -14,8 +14,18 @@ const FlashcardComponent = ({ card }: { card: Flashcard }) => {
     };
 
     return (
-        <div onClick={handleFlip} className="flashcard">
-            <p>{isFlipped ? card.back : card.front}</p>
+        <div
+            onClick={handleFlip}
+            className={`flashcard ${isFlipped ? "flipped" : ""}`}
+        >
+            <div className="flashcard-inner">
+                <div className="flashcard-front">
+                    <p>{card.front}</p>
+                </div>
+                <div className="flashcard-back">
+                    <p>{card.back}</p>
+                </div>
+            </div>
         </div>
     );
 };
@@ -32,28 +42,5 @@ function App() {
         </div>
     );
 }
-
-// const styles = {
-//     container: {
-//       display: 'flex',
-//       flexDirection: 'column' as 'column',
-//       alignItems: 'center',
-//       justifyContent: 'center',
-//       minHeight: '100vh',
-//       fontFamily: 'Arial, sans-serif',
-//     },
-//     card: {
-//       border: '2px solid #333',
-//       borderRadius: '8px',
-//       padding: '20px',
-//       width: '300px',
-//       textAlign: 'center' as 'center',
-//       cursor: 'pointer',
-//       boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
-//     },
-//     text: {
-//       fontSize: '1.5rem',
-//     },
-//   };
 
 export default App;
