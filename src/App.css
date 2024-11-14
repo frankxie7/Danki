@@ -5,23 +5,48 @@
   text-align: center;
 }
 
+/* Main app container */
 .app {
   display: flex;
-  flex-direction: row;
-  height: 100vh;
-  justify-content: flex-start;
+  flex-direction: column;
   align-items: center;
-  padding: 2rem;
-  position: relative; 
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  height: 100%; 
 }
 
+/* Header */
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+  background-color: #f8f8f8;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: lightcoral;
+  margin: 0;
+}
+
+/* Content layout */
+.content {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  padding-top: 1rem;
+}
+
+/* Navbar */
 .navbar {
   display: flex;
-  flex-direction: column; 
-  justify-content: flex-start;
+  flex-direction: column;
   align-items: flex-start;
-  margin-right: 2rem; 
-  width: 200px; 
+  width: 200px;
+  padding: 1rem;
 }
 
 .navbar button {
@@ -32,9 +57,9 @@
   padding: 10px 20px;
   font-size: 1rem;
   cursor: pointer;
-  margin: 5px 0; 
+  margin: 5px 0;
   transition: background-color 0.3s;
-  width: 100%; 
+  width: 100%;
 }
 
 .navbar button:hover {
@@ -42,14 +67,23 @@
 }
 
 .navbar button.selected {
-  background-color: #005bb5; 
+  background-color: #005bb5;
   font-weight: bold;
 }
 
+/* Flashcard container */
+.flashcard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
 
+/* Flashcard */
 .flashcard {
   width: 300px;
-  height: 200px;
+  height: 200px; 
   background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
@@ -57,7 +91,6 @@
   overflow: hidden;
   perspective: 1000px;
   transition: transform 0.5s ease-in-out;
-  margin-left: 20px; 
 }
 
 .flashcard-inner {
@@ -98,6 +131,7 @@
   transform: rotateY(180deg);
 }
 
+/* Navigation */
 .navigation {
   display: flex;
   justify-content: center;
@@ -118,17 +152,6 @@
 
 .navigation button:hover {
   background-color: #005bb5;
-}
-
-.title {
-  position: absolute;
-  left: 50%; 
-  transform: translateX(-50%); 
-  font-size: 2rem;
-  font-weight: bold;
-  color: blue;
-  margin-bottom: 20px;
-  background-color: white;
 }
 
 .flashcard.no-flip .flashcard-inner {
