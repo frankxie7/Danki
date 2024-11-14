@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState} from "react";
 import "./App.css";
 
 type Flashcard = {
@@ -8,11 +8,11 @@ type Flashcard = {
 
 const FlashcardComponent = ({ card }: { card: Flashcard }) => {
     const [isFlipped, setIsFlipped] = useState<boolean>(false);
-
     const handleFlip = () => {
         setIsFlipped(!isFlipped);
     };
 
+    
     return (
         <div
             onClick={handleFlip}
