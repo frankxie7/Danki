@@ -1,16 +1,10 @@
-# Advanced React Starter Template
+# Danki (FlashCard Program)
 
-A Trends in Web Development Starter Template.
-
-This template is appropriate for:
-
--   Simple frontends
--   Demos
--   Etc.
+Trends in Web Development Final Project.
 
 It features the following:
 
--   A dead-simple React counter app, as a starting point.
+-   A flashcard app with mutiple sample decks. (User deck creation and database is WIP)
 
 It also utilizes the following core libraries:
 

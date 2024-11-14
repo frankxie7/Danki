@@ -15,7 +15,6 @@ const FlashcardComponent = ({ card, isNavigating }: { card: Flashcard; isNavigat
         }
     };
 
-    // Whenever the card changes, ensure it starts on the front by resetting `isFlipped` to false.
     useEffect(() => {
         setIsFlipped(false);
     }, [card]);
@@ -38,7 +37,6 @@ const FlashcardComponent = ({ card, isNavigating }: { card: Flashcard; isNavigat
 };
 
 function App() {
-    // Define multiple decks
     const decks: { [key: string]: Flashcard[] } = {
         "Geography": [
             { front: "What is the capital of France?", back: "Paris" },
@@ -57,17 +55,15 @@ function App() {
         ],
     };
 
-    // Track the selected deck and the current flashcard index
     const [selectedDeck, setSelectedDeck] = useState("Geography");
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [isNavigating, setIsNavigating] = useState(false); // Track navigation state
-
+    const [isNavigating, setIsNavigating] = useState(false); 
     const goToPrevious = () => {
         setIsNavigating(true);
         setCurrentIndex((prevIndex) =>
             prevIndex > 0 ? prevIndex - 1 : decks[selectedDeck].length - 1
         );
-        setTimeout(() => setIsNavigating(false), 500); // Delay to allow the transition
+        setTimeout(() => setIsNavigating(false), 500); 
     };
 
     const goToNext = () => {
@@ -75,21 +71,21 @@ function App() {
         setCurrentIndex((prevIndex) =>
             prevIndex < decks[selectedDeck].length - 1 ? prevIndex + 1 : 0
         );
-        setTimeout(() => setIsNavigating(false), 500); // Delay to allow the transition
+        setTimeout(() => setIsNavigating(false), 500);
     };
 
     return (
         <div className="app">
-            <h1 className="title">Danki</h1>
-
-            {/* Navbar for selecting different decks */}
+            <header className = "header">
+                <h1 className="title">Danki</h1>
+            </header>
             <div className="navbar">
                 {Object.keys(decks).map((deckName) => (
                     <button
                         key={deckName}
                         onClick={() => {
                             setSelectedDeck(deckName);
-                            setCurrentIndex(0); // Reset to the first card of the selected deck
+                            setCurrentIndex(0);
                         }}
                         className={selectedDeck === deckName ? "selected" : ""}
                     >
@@ -98,10 +94,8 @@ function App() {
                 ))}
             </div>
 
-            {/* Display the flashcard of the selected deck */}
             <FlashcardComponent card={decks[selectedDeck][currentIndex]} isNavigating={isNavigating} />
             
-            {/* Navigation buttons */}
             <div className="navigation">
                 <button onClick={goToPrevious}>⬅️ Previous</button>
                 <button onClick={goToNext}>Next ➡️</button>
