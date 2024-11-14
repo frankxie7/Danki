@@ -1,4 +1,8 @@
 // app.js
+
+import { db } from './firebase';
+
+
 const express = require('express');
 const admin = require('firebase-admin');
 const serviceAccount = require('./firebaseServiceAccount.json');
@@ -100,3 +104,15 @@ app.post('/decks', async (req, res) => {
     console.log(`Server is running on port ${PORT}`);
   });
   
+
+
+  fetch('http://localhost:5173/', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ key: 'value' }),
+  })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
