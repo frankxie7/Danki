@@ -38,6 +38,7 @@ function App() {
 
     return (
         <div className="app">
+            <h1 className="title">Danki</h1>
             <FlashcardComponent card={sampleCard} />
         </div>
     );
