@@ -7,19 +7,45 @@
 
 .app {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
   height: 100vh;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 2rem;
+  position: relative; 
 }
 
-.title {
-  font-size: 2rem;
-  font-weight: bold;
-  color: blue;
-  margin-bottom: 20px;
-  background-color: white;
+.navbar {
+  display: flex;
+  flex-direction: column; 
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-right: 2rem; 
+  width: 200px; 
 }
+
+.navbar button {
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 5px 0; 
+  transition: background-color 0.3s;
+  width: 100%; 
+}
+
+.navbar button:hover {
+  background-color: #005bb5;
+}
+
+.navbar button.selected {
+  background-color: #005bb5; 
+  font-weight: bold;
+}
+
 
 .flashcard {
   width: 300px;
@@ -31,6 +57,7 @@
   overflow: hidden;
   perspective: 1000px;
   transition: transform 0.5s ease-in-out;
+  margin-left: 20px; 
 }
 
 .flashcard-inner {
@@ -44,7 +71,8 @@
   transform: rotateY(180deg);
 }
 
-.flashcard-front, .flashcard-back {
+.flashcard-front,
+.flashcard-back {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -70,6 +98,39 @@
   transform: rotateY(180deg);
 }
 
-.flashcard:hover {
-  transform: scale(1.05);
+.navigation {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.navigation button {
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 0 10px;
+  transition: background-color 0.3s;
+}
+
+.navigation button:hover {
+  background-color: #005bb5;
+}
+
+.title {
+  position: absolute;
+  left: 50%; 
+  transform: translateX(-50%); 
+  font-size: 2rem;
+  font-weight: bold;
+  color: blue;
+  margin-bottom: 20px;
+  background-color: white;
+}
+
+.flashcard.no-flip .flashcard-inner {
+  transition: none; 
 }
