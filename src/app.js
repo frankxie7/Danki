@@ -1,6 +1,6 @@
 import express from 'express';
 import { db } from '../server/firebase.js';
-import { collection, setDoc, getDoc, getDocs, doc, updateDoc, increment, deleteDoc } from 'firebase/firestore';
+import { collection, setDoc, getDoc, getDocs, doc, updateDoc, increment, deleteDoc, query, where } from 'firebase/firestore';
 
 const app = express();
 app.use(express.json());
@@ -63,9 +63,10 @@ app.post('/deck/:deckId/card', async (req, res) => {
 
   try {
     const cardId = await getNextCardId();
-    const cardRef = doc(db, 'decks', deckId, 'cards', cardId.toString());
+    const cardRef = doc(db, 'cards', cardId.toString());
     await setDoc(cardRef, {
       id: cardId,
+      deckId: deckId,  // Explicitly associate card with deck ID
       frontText,
       backText,
     });
@@ -76,13 +77,33 @@ app.post('/deck/:deckId/card', async (req, res) => {
   }
 });
 
-// Route to update a card by ID within a specific deck
+// Route to get all cards associated with a specific deck
+app.get('/deck/:deckId/cards', async (req, res) => {
+  const deckId = req.params.deckId;
+
+  try {
+    const cardsRef = collection(db, 'cards');
+    const cardsQuery = query(cardsRef, where("deckId", "==", deckId));
+    const cardsSnapshot = await getDocs(cardsQuery);
+
+    const cards = cardsSnapshot.docs.map(doc => ({
+      id: doc.data().id,
+      ...doc.data(),
+    }));
+    res.status(200).json(cards);
+  } catch (error) {
+    console.error("Error fetching cards:", error);
+    res.status(500).json({ error: "Failed to retrieve cards" });
+  }
+});
+
+// Route to update a card by ID
 app.put('/deck/:deckId/card/:cardId', async (req, res) => {
   const { deckId, cardId } = req.params;
   const { frontText, backText } = req.body;
 
   try {
-    const cardRef = doc(db, 'decks', deckId, 'cards', cardId);
+    const cardRef = doc(db, 'cards', cardId);
     await updateDoc(cardRef, { frontText, backText });
     res.status(200).json({ message: `Card ${cardId} updated successfully` });
   } catch (error) {
@@ -91,12 +112,12 @@ app.put('/deck/:deckId/card/:cardId', async (req, res) => {
   }
 });
 
-// Route to delete a card by ID within a specific deck
+// Route to delete a card by ID
 app.delete('/deck/:deckId/card/:cardId', async (req, res) => {
   const { deckId, cardId } = req.params;
 
   try {
-    const cardRef = doc(db, 'decks', deckId, 'cards', cardId);
+    const cardRef = doc(db, 'cards', cardId);
     await deleteDoc(cardRef);
     res.status(200).json({ message: `Card ${cardId} deleted successfully` });
   } catch (error) {
@@ -105,12 +126,12 @@ app.delete('/deck/:deckId/card/:cardId', async (req, res) => {
   }
 });
 
-// Route to get a card by ID within a specific deck
+// Route to get a card by ID
 app.get('/deck/:deckId/card/:cardId', async (req, res) => {
   const { deckId, cardId } = req.params;
 
   try {
-    const cardRef = doc(db, 'decks', deckId, 'cards', cardId);
+    const cardRef = doc(db, 'cards', cardId);
     const cardSnapshot = await getDoc(cardRef);
 
     if (cardSnapshot.exists()) {
@@ -124,17 +145,18 @@ app.get('/deck/:deckId/card/:cardId', async (req, res) => {
   }
 });
 
-// Route to create a new deck with an auto-incremented ID
+// Route to create a new deck with title and description
 app.post('/deck', async (req, res) => {
+  const { title, description } = req.body;
+
   try {
     const deckId = await getNextDeckId();
     await setDoc(doc(db, 'decks', deckId.toString()), {
       id: deckId,
-      title: "Untitled Deck",
-      description: "This is a blank deck.",
-      cards: [],
+      title: title || "Untitled Deck",
+      description: description || "No description provided.",
     });
-    res.status(201).json({ deckId, message: "Blank deck created successfully" });
+    res.status(201).json({ deckId, message: "Deck created successfully" });
   } catch (error) {
     console.error("Error creating deck:", error);
     res.status(500).json({ error: "Failed to create deck" });
