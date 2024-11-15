@@ -66,7 +66,7 @@ app.post('/deck/:deckId/card', async (req, res) => {
     const cardRef = doc(db, 'cards', cardId.toString());
     await setDoc(cardRef, {
       id: cardId,
-      deckId: deckId,  // Explicitly associate card with deck ID
+      deckId: deckId, 
       frontText,
       backText,
     });
@@ -77,11 +77,52 @@ app.post('/deck/:deckId/card', async (req, res) => {
   }
 });
 
+app.get('/decks', async (req, res) => {
+  try {
+    const decksCollection = collection(db, 'decks');
+    const decksSnapshot = await getDocs(decksCollection);
+
+    const decks = await Promise.all(decksSnapshot.docs.map(async (deckDoc) => {
+      const deckData = deckDoc.data();
+
+      const cardsRef = collection(db, 'cards');
+      const cardsQuery = query(cardsRef, where("deckId", "==", deckData.id.toString()));
+      const cardsSnapshot = await getDocs(cardsQuery);
+
+      const cards = cardsSnapshot.docs.map(cardDoc => ({
+        id: cardDoc.data().id,
+        ...cardDoc.data(),
+      }));
+
+      return {
+        ...deckData,
+        cards,
+      };
+    }));
+
+    res.status(200).json(decks);
+  } catch (error) {
+    console.error("Error fetching decks and their cards:", error);
+    res.status(500).json({ error: "Failed to retrieve decks and cards" });
+  }
+});
+
+
+
 // Route to get all cards associated with a specific deck
-app.get('/deck/:deckId/cards', async (req, res) => {
+app.get('/deck/:deckId', async (req, res) => {
   const deckId = req.params.deckId;
 
   try {
+    const deckRef = doc(db, 'decks', deckId);
+    const deckSnapshot = await getDoc(deckRef);
+
+    if (!deckSnapshot.exists()) {
+      return res.status(404).json({ error: `Deck with ID ${deckId} not found` });
+    }
+
+    const deckData = deckSnapshot.data();
+
     const cardsRef = collection(db, 'cards');
     const cardsQuery = query(cardsRef, where("deckId", "==", deckId));
     const cardsSnapshot = await getDocs(cardsQuery);
@@ -90,30 +131,22 @@ app.get('/deck/:deckId/cards', async (req, res) => {
       id: doc.data().id,
       ...doc.data(),
     }));
-    res.status(200).json(cards);
+
+    const response = {
+      ...deckData,
+      cards, 
+    };
+
+    res.status(200).json(response);
   } catch (error) {
-    console.error("Error fetching cards:", error);
-    res.status(500).json({ error: "Failed to retrieve cards" });
+    console.error("Error fetching deck and cards:", error);
+    res.status(500).json({ error: "Failed to retrieve deck and cards" });
   }
 });
 
-// Route to update a card by ID
-app.put('/deck/:deckId/card/:cardId', async (req, res) => {
-  const { deckId, cardId } = req.params;
-  const { frontText, backText } = req.body;
-
-  try {
-    const cardRef = doc(db, 'cards', cardId);
-    await updateDoc(cardRef, { frontText, backText });
-    res.status(200).json({ message: `Card ${cardId} updated successfully` });
-  } catch (error) {
-    console.error("Error updating card:", error);
-    res.status(500).json({ error: "Failed to update card" });
-  }
-});
 
 // Route to delete a card by ID
-app.delete('/deck/:deckId/card/:cardId', async (req, res) => {
+app.delete('/card/:cardId', async (req, res) => {
   const { deckId, cardId } = req.params;
 
   try {
@@ -127,7 +160,7 @@ app.delete('/deck/:deckId/card/:cardId', async (req, res) => {
 });
 
 // Route to get a card by ID
-app.get('/deck/:deckId/card/:cardId', async (req, res) => {
+app.get('/card/:cardId', async (req, res) => {
   const { deckId, cardId } = req.params;
 
   try {
@@ -163,21 +196,6 @@ app.post('/deck', async (req, res) => {
   }
 });
 
-// Route to get all decks
-app.get('/decks', async (req, res) => {
-  try {
-    const decksCollection = collection(db, 'decks');
-    const decksSnapshot = await getDocs(decksCollection);
-    const decks = decksSnapshot.docs.map(doc => ({
-      id: doc.data().id,
-      ...doc.data(),
-    }));
-    res.status(200).json(decks);
-  } catch (error) {
-    console.error("Error fetching decks:", error);
-    res.status(500).json({ error: "Failed to retrieve decks" });
-  }
-});
 
 // Route to get a deck by ID
 app.get('/deck/:id', async (req, res) => {
