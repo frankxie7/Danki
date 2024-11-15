@@ -1,5 +1,5 @@
 import express from 'express';
-import { db } from '../server/firebase.js';
+import { db } from './server/firebase.js';
 import { collection, setDoc, getDoc, getDocs, doc, updateDoc, increment, deleteDoc, query, where } from 'firebase/firestore';
 
 const app = express();
