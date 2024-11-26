@@ -178,6 +178,32 @@ app.get('/card/:cardId', async (req, res) => {
   }
 });
 
+// Route to update a card by ID
+app.put('/card/:cardId', async (req, res) => {
+  const cardId = req.params.cardId;
+  const { frontText, backText } = req.body;
+
+  try {
+    const cardRef = doc(db, 'cards', cardId);
+    const cardSnapshot = await getDoc(cardRef);
+
+    if (!cardSnapshot.exists()) {
+      return res.status(404).json({ error: `Card with ID ${cardId} not found` });
+    }
+
+    await updateDoc(cardRef, {
+      ...(frontText && { frontText }),
+      ...(backText && { backText }),
+    });
+
+    res.status(200).json({ message: `Card ${cardId} updated successfully` });
+  } catch (error) {
+    console.error("Error updating card:", error);
+    res.status(500).json({ error: "Failed to update card" });
+  }
+});
+
+
 // Route to create a new deck with title and description
 app.post('/deck', async (req, res) => {
   const { title, description } = req.body;
