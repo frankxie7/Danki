@@ -5,6 +5,8 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": false,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -20,6 +22,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/server/firebase.ts"],
+  "include": ["src", "./server/firebase.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
