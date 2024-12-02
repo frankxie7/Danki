@@ -4,7 +4,10 @@ Trends in Web Development Final Project.
 
 It features the following:
 
--   A flashcard app with mutiple sample decks. (User deck creation and database is WIP)
+-   Flashcards that can be flipped back and forth.
+-   Decks of flashcards that allow users to move between different flashcards. 
+-   Allows users to create and delete decks. 
+-   Allows users to add and delete cards from existing decks.
 
 It also utilizes the following core libraries:
 
