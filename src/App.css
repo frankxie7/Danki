@@ -1,3 +1,4 @@
+/* Root container */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -13,7 +14,7 @@
   justify-content: center;
   flex: 1;
   width: 100%;
-  height: 100%; 
+  height: 100%;
 }
 
 /* Header */
@@ -23,24 +24,22 @@
   justify-content: center;
   padding: 1rem 0;
   background-color: #f8f8f8;
+  border-radius: 0.5rem;
 }
 
 .title {
   font-size: 2rem;
   font-weight: bold;
-  color: lightcoral;
-  margin: 0;
+  color: white;
+  background-color: lightcoral;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  display: inline-block;
+  margin: 0 auto;
 }
 
-/* Content layout */
-.content {
-  display: flex;
-  flex: 1;
-  width: 100%;
-  padding-top: 1rem;
-}
-
-/* Navbar */
+/* Navigation bar */
 .navbar {
   display: flex;
   flex-direction: column;
@@ -50,7 +49,7 @@
 }
 
 .navbar button {
-  background-color: #007aff;
+  background-color: #FFB6C1;
   color: white;
   border: none;
   border-radius: 5px;
@@ -63,11 +62,11 @@
 }
 
 .navbar button:hover {
-  background-color: #005bb5;
+  background-color: #FF1493;
 }
 
 .navbar button.selected {
-  background-color: #005bb5;
+  background-color: #FF1493;
   font-weight: bold;
 }
 
@@ -80,10 +79,10 @@
   flex: 1;
 }
 
-/* Flashcard */
+/* Flashcard styles */
 .flashcard {
   width: 300px;
-  height: 200px; 
+  height: 200px;
   background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
@@ -126,12 +125,17 @@
 }
 
 .flashcard-back {
-  background-color: #007aff;
+  background-color: #FFB6C1;
   color: white;
   transform: rotateY(180deg);
 }
 
-/* Navigation */
+/* Flashcard disable flip animation */
+.flashcard.no-flip .flashcard-inner {
+  transition: none;
+}
+
+/* Navigation buttons */
 .navigation {
   display: flex;
   justify-content: center;
@@ -154,6 +158,62 @@
   background-color: #005bb5;
 }
 
-.flashcard.no-flip .flashcard-inner {
-  transition: none; 
+/* General button styles */
+button {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Create Deck Button */
+button.create-deck {
+  background-color: #4CAF50;
+  color: white;
+}
+
+button.create-deck:hover {
+  background-color: #45a049;
+}
+
+/* Delete Deck Button */
+button.delete-deck {
+  background-color: #f44336;
+  color: white;
+}
+
+button.delete-deck:hover {
+  background-color: #e53935;
+}
+
+/* Add Card Button */
+button.add-card {
+  background-color: #2196F3;
+  color: white;
+}
+
+button.add-card:hover {
+  background-color: #1976d2;
+}
+
+/* Delete Card Button */
+button.delete-card {
+  background-color: #FF9800;
+  color: white;
+}
+
+button.delete-card:hover {
+  background-color: #fb8c00;
+}
+
+/* Centering buttons in actions container */
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }

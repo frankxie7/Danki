@@ -1,27 +1,25 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
-// Define the Flashcard type
 type Flashcard = {
+    id: string;
     front: string;
     back: string;
 };
 
-// Define the Deck type
 type Deck = {
     id: string;
     title: string;
     cards: Flashcard[];
 };
 
-// FlashcardComponent Props
 interface FlashcardComponentProps {
     card: Flashcard;
     isNavigating: boolean;
+    onDelete: (cardId: string) => void;
 }
 
-// FlashcardComponent
-const FlashcardComponent: React.FC<FlashcardComponentProps> = ({ card, isNavigating }) => {
+const FlashcardComponent: React.FC<FlashcardComponentProps> = ({ card, isNavigating, onDelete }) => {
     const [isFlipped, setIsFlipped] = useState(false);
 
     const handleFlip = () => {
@@ -35,23 +33,33 @@ const FlashcardComponent: React.FC<FlashcardComponentProps> = ({ card, isNavigat
     }, [card]);
 
     return (
-        <div
-            onClick={handleFlip}
-            className={`flashcard ${isFlipped ? "flipped" : ""} ${isNavigating ? "no-flip" : ""}`}
-        >
-            <div className="flashcard-inner">
-                <div className="flashcard-front">
-                    <p>{card.front}</p>
-                </div>
-                <div className="flashcard-back">
-                    <p>{card.back}</p>
+        <div className="flashcard-container">
+            <div
+                onClick={handleFlip}
+                className={`flashcard ${isFlipped ? "flipped" : ""} ${isNavigating ? "no-flip" : ""}`}
+            >
+                <div className="flashcard-inner">
+                    <div className="flashcard-front">
+                        <p>{card.front}</p>
+                    </div>
+                    <div className="flashcard-back">
+                        <p>{card.back}</p>
+                    </div>
                 </div>
             </div>
+            <button
+                className="delete-card"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(card.id);
+                }}
+            >
+                Delete Card
+            </button>
         </div>
     );
 };
 
-// App Component
 const App: React.FC = () => {
     const [decks, setDecks] = useState<Deck[]>([]);
     const [selectedDeckId, setSelectedDeckId] = useState<string>("");
@@ -60,7 +68,16 @@ const App: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Fetch decks from the backend
+    type DeckResponse = {
+        id: string;
+        title: string;
+        cards: {
+            id: string;
+            frontText: string;
+            backText: string;
+        }[];
+    };
+
     const fetchDecks = async () => {
         setLoading(true);
         setError(null);
@@ -71,13 +88,13 @@ const App: React.FC = () => {
                 throw new Error("Failed to fetch decks");
             }
 
-            const data = await response.json();
+            const data: DeckResponse[] = await response.json();
 
-            // Assuming the API returns an array of decks with id, title, and cards
-            const fetchedDecks: Deck[] = data.map((deck: any) => ({
+            const fetchedDecks: Deck[] = data.map((deck) => ({
                 id: deck.id,
                 title: deck.title || `Deck ${deck.id}`,
-                cards: deck.cards.map((card: any) => ({
+                cards: deck.cards.map((card) => ({
+                    id: card.id,
                     front: card.frontText,
                     back: card.backText,
                 })),
@@ -85,7 +102,6 @@ const App: React.FC = () => {
 
             setDecks(fetchedDecks);
 
-            // If no deck is selected, default to the first deck
             if (!selectedDeckId && fetchedDecks.length > 0) {
                 setSelectedDeckId(fetchedDecks[0].id);
                 setCurrentIndex(0);
@@ -99,14 +115,12 @@ const App: React.FC = () => {
 
     useEffect(() => {
         fetchDecks();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Navigation between cards
     const goToPrevious = () => {
         if (!selectedDeckId) return;
 
-        const currentDeck = decks.find(deck => deck.id === selectedDeckId);
+        const currentDeck = decks.find((deck) => deck.id === selectedDeckId);
         if (!currentDeck) return;
 
         if (currentDeck.cards.length === 0) return;
@@ -121,7 +135,7 @@ const App: React.FC = () => {
     const goToNext = () => {
         if (!selectedDeckId) return;
 
-        const currentDeck = decks.find(deck => deck.id === selectedDeckId);
+        const currentDeck = decks.find((deck) => deck.id === selectedDeckId);
         if (!currentDeck) return;
 
         if (currentDeck.cards.length === 0) return;
@@ -133,15 +147,11 @@ const App: React.FC = () => {
         setTimeout(() => setIsNavigating(false), 500);
     };
 
-    // Add a card to a deck
     const addCardToDeck = async (deckId: string, frontText: string, backText: string) => {
-        // Optimistic UI update: Add the new card locally first
-        const newCard: Flashcard = { front: frontText, back: backText };
+        const newCard: Flashcard = { id: "", front: frontText, back: backText };
         setDecks((prevDecks) =>
-            prevDecks.map(deck =>
-                deck.id === deckId
-                    ? { ...deck, cards: [...deck.cards, newCard] }
-                    : deck
+            prevDecks.map((deck) =>
+                deck.id === deckId ? { ...deck, cards: [...deck.cards, newCard] } : deck
             )
         );
 
@@ -155,36 +165,44 @@ const App: React.FC = () => {
             if (response.ok) {
                 const result = await response.json();
                 console.log("Card added:", result);
+                await fetchDecks();
             } else {
                 console.error("Error adding card:", response.statusText);
-                // Revert the optimistic update
-                setDecks((prevDecks) =>
-                    prevDecks.map(deck =>
-                        deck.id === deckId
-                            ? { ...deck, cards: deck.cards.slice(0, -1) }
-                            : deck
-                    )
-                );
                 alert("Failed to add the card. Please try again.");
             }
         } catch (error) {
             console.error("Error adding card:", error);
-            // Revert the optimistic update
-            setDecks((prevDecks) =>
-                prevDecks.map(deck =>
-                    deck.id === deckId
-                        ? { ...deck, cards: deck.cards.slice(0, -1) }
-                        : deck
-                )
-            );
             alert("An error occurred while adding the card. Please try again.");
         }
     };
 
-    // Create a new deck
+    const deleteCard = async (cardId: string) => {
+        try {
+            const response = await fetch(`http://localhost:3000/card/${cardId}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                setDecks((prevDecks) =>
+                    prevDecks.map((deck) => ({
+                        ...deck,
+                        cards: deck.cards.filter((card) => card.id !== cardId),
+                    }))
+                );
+                console.log(`Card ${cardId} deleted.`);
+            } else {
+                console.error("Error deleting card:", response.statusText);
+                alert("Failed to delete card. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error deleting card:", error);
+            alert("An error occurred while deleting the card. Please try again.");
+        }
+    };
+
     const createNewDeck = async () => {
         const title = prompt("Enter the title for your new deck:");
-        if (!title) return; // Cancelled or empty title
+        if (!title) return;
 
         try {
             const response = await fetch("http://localhost:3000/deck", {
@@ -196,13 +214,7 @@ const App: React.FC = () => {
             if (response.ok) {
                 const result = await response.json();
                 console.log("Deck created:", result);
-                await fetchDecks(); // Refresh decks to include the new deck
-
-                // Optionally, select the newly created deck
-                if (result.id) {
-                    setSelectedDeckId(result.id);
-                    setCurrentIndex(0);
-                }
+                await fetchDecks();
             } else {
                 console.error("Error creating deck:", response.statusText);
                 alert("Failed to create deck. Please try again.");
@@ -213,23 +225,6 @@ const App: React.FC = () => {
         }
     };
 
-    // Handle adding a card (prompt user for front/back text)
-    const handleAddCard = () => {
-        if (!selectedDeckId) {
-            alert("Please select a deck first.");
-            return;
-        }
-
-        const frontText = prompt("Enter the front text for your new card:");
-        if (!frontText) return; // Cancelled or empty front text
-
-        const backText = prompt("Enter the back text for your new card:");
-        if (!backText) return; // Cancelled or empty back text
-
-        addCardToDeck(selectedDeckId, frontText, backText);
-    };
-
-    // Delete a deck
     const deleteDeck = async (deckId: string, deckTitle: string) => {
         if (!window.confirm(`Are you sure you want to delete the deck "${deckTitle}"?`)) {
             return;
@@ -242,13 +237,11 @@ const App: React.FC = () => {
 
             if (response.ok) {
                 console.log(`Deck "${deckTitle}" deleted.`);
-                // Remove the deck from the state
-                setDecks((prevDecks) => prevDecks.filter(deck => deck.id !== deckId));
+                setDecks((prevDecks) => prevDecks.filter((deck) => deck.id !== deckId));
 
-                // If the deleted deck was selected, clear selection or select another deck
                 if (selectedDeckId === deckId) {
                     if (decks.length > 1) {
-                        const remainingDecks = decks.filter(deck => deck.id !== deckId);
+                        const remainingDecks = decks.filter((deck) => deck.id !== deckId);
                         setSelectedDeckId(remainingDecks[0].id);
                         setCurrentIndex(0);
                     } else {
@@ -266,8 +259,7 @@ const App: React.FC = () => {
         }
     };
 
-    // Get the currently selected deck
-    const selectedDeck = decks.find(deck => deck.id === selectedDeckId);
+    const selectedDeck = decks.find((deck) => deck.id === selectedDeckId);
 
     return (
         <div className="app">
@@ -301,6 +293,7 @@ const App: React.FC = () => {
                             <FlashcardComponent
                                 card={selectedDeck.cards[currentIndex]}
                                 isNavigating={isNavigating}
+                                onDelete={deleteCard}
                             />
                         ) : (
                             <p>This deck has no cards. Add some!</p>
@@ -319,14 +312,22 @@ const App: React.FC = () => {
                     </div>
 
                     <div className="actions">
-                        <button onClick={createNewDeck}>Create New Deck</button>
-                        <button onClick={handleAddCard} disabled={!selectedDeck}>
-                            Add Card
-                        </button>
+                        <button className="create-deck" onClick={createNewDeck}>Create New Deck</button>
                         {selectedDeck && (
-                            <button onClick={() => deleteDeck(selectedDeck.id, selectedDeck.title)}>
-                                Delete Deck
-                            </button>
+                            <>
+                                <button className="delete-deck" onClick={() => deleteDeck(selectedDeck.id, selectedDeck.title)}>
+                                    Delete Deck
+                                </button>
+                                <button className="add-card"
+                                    onClick={() => {
+                                        const frontText = prompt("Enter the front text for your new card:");
+                                        const backText = prompt("Enter the back text for your new card:");
+                                        if (frontText && backText) addCardToDeck(selectedDeck.id, frontText, backText);
+                                    }}
+                                >
+                                    Add Card
+                                </button>
+                            </>
                         )}
                     </div>
                 </>
