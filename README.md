@@ -9,6 +9,11 @@ It features the following:
 -   Allows users to create and delete decks. 
 -   Allows users to add and delete cards from existing decks.
 
+How to run: 
+
+- First use the terminal to run node src/app.js.
+- Then use pnpm dev to generate the localhost linked to the app. 
+
 It also utilizes the following core libraries:
 
 -   React
