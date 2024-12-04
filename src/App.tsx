@@ -13,13 +13,13 @@ type Deck = {
     cards: Flashcard[];
 };
 
-interface FlashcardComponentProps {
+interface FlashcardStatus {
     card: Flashcard;
     isNavigating: boolean;
     onDelete: (cardId: string) => void;
 }
 
-const FlashcardComponent: React.FC<FlashcardComponentProps> = ({ card, isNavigating, onDelete }) => {
+const FlashcardComponent: React.FC<FlashcardStatus> = ({ card, isNavigating, onDelete }) => {
     const [isFlipped, setIsFlipped] = useState(false);
 
     const handleFlip = () => {
