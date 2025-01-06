@@ -68,7 +68,7 @@ const App: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    type DeckResponse = {
+    type DeckStatus = {
         id: string;
         title: string;
         cards: {
@@ -88,7 +88,7 @@ const App: React.FC = () => {
                 throw new Error("Failed to fetch decks");
             }
 
-            const data: DeckResponse[] = await response.json();
+            const data: DeckStatus[] = await response.json();
 
             const fetchedDecks: Deck[] = data.map((deck) => ({
                 id: deck.id,
